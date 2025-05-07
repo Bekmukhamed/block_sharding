@@ -4,6 +4,7 @@ import sys
 import subprocess
 import time
 
+# original num_nodes = [100], num_shards = [i for i in range(3, 60)]
 num_nodes = [100]
 num_shards = [i for i in range(3, 60)]
 # tx_block_capacity = [5, 8, 10, 15, 20]
@@ -15,7 +16,7 @@ for node_cnt in num_nodes:
     for shard_cnt in num_shards:
         if shard_cnt == int(0.65 * node_cnt / 3):
             break
-        
+
         for cs_tx_ratio in cs_tx_fraction:
             filename = 'config/params.json'
             with open(filename, 'r') as f:
@@ -24,12 +25,12 @@ for node_cnt in num_nodes:
                 data['num_shards'] = shard_cnt
                 data['verbose'] = 0 if node_cnt > 15 else 1
                 data['cross_shard_tx_percentage'] = cs_tx_ratio
-                
+
             os.remove(filename)
             with open(filename, 'w') as f:
                 json.dump(data, f, indent=4)
 
-            cmd = ['python', 'simulate.py', dir_suffix]
+            cmd = [sys.executable, 'simulate.py', dir_suffix]
             proc = subprocess.Popen(cmd)
             proc.wait()
 

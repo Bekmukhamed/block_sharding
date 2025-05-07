@@ -123,7 +123,12 @@ class Network:
         
         # Allot nodes to different shards
         shard_nodes = nodes[num_principal_committe_nodes:]
-        shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
+	if self.params["num_shards"] <= 0:
+   	# No sharding — treat all nodes as part of one group
+    	    shard_groups = [shard_nodes]  # just one group with all nodes
+	else:
+    	    shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
+        # shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
         
         for idx in range(self.params["num_shards"]):
             # Randomly select the shard leader
@@ -277,10 +282,12 @@ class Network:
 
             if id not in neighbours_info.keys():
                 neighbours_info[id] = set()            
-            
+	# changed size
+            sample_size = min(degree, len(possible_neighbours))
+
             neighbours_list = np.random.choice(
                 possible_neighbours, 
-                size=degree, 
+                size=sample_size, 
                 replace=False
             )
                 

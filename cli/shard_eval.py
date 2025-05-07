@@ -10,23 +10,23 @@ def pass_handler(signal, frame):
 
 
 def execute_command(filename, parameter):
-    cmd = ['python', filename]
+    cmd = [sys.executable, filename]
     if parameter:
         cmd.append(parameter)
-    
+
     proc = subprocess.Popen(cmd)
     proc.wait()
 
     (stdout, stderr) = proc.communicate()
     if proc.returncode != 0:
         sys.exit("\x1b[1;31m[script.py]: Aw, Snap! An error has occurred")
-    
+
 
 @click.group()
 def main():
     f = Figlet(font='ogre')
     click.secho(f.renderText('ShardEval'), fg='green')
-    
+
 
 @main.command(help='Initiate a simulation')
 def run_simulation():
