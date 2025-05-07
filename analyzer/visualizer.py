@@ -2,6 +2,7 @@ import os, sys, inspect
 import pandas as pd
 import matplotlib.pyplot as plt
 import pathlib
+import numpy as np
 
 current_dir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parent_dir = os.path.dirname(current_dir)
@@ -25,7 +26,7 @@ def __visualize(df, base_list, param_list, cond_list, base_col, param_col, cond_
             plt.xlabel(param_col)
             plt.ylabel(tps_col)
             plt.title(f'{plt_title} for {base_col} = {n}')
-            plt.plot(x, y, marker="o")
+            plt.plot(np.array(x), np.array(y), marker="o")
 
             # plt.grid()
             plt.savefig(f"{plt_name}_{base_col}={n}_{cond_col}={m}.png")

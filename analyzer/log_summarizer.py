@@ -24,9 +24,9 @@ def summarize(dir):
                 'Total no of transactions processed = ', 'Total no of intra-shard transactions processed = ', 'Total no of cross-shard transactions processed = ', \
                 'Total no of transactions generated = ', 'Total no of intra-shard transactions generated = ', 'Total no of cross-shard transactions generated = ', \
                 'Processed TPS = ', 'Accepted TPS = ']
-    
+
     col_names = [name.rstrip(' = ') for name in queries]
-    
+
     dir_name = f"logs_data/summary/{pathlib.PurePath(dir).parent.name}"
     if not os.path.exists(dir_name):
         ColorPrint.print_info(f"\n[Info]: Creating directory '{dir_name}' for storing summary of the simulation logs\n")
@@ -55,7 +55,7 @@ def main():
 
     dir = sys.argv[1]
     summarize(dir)
-    
+
 
 if __name__=="__main__":
     main()
