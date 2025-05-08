@@ -303,6 +303,8 @@ class Network:
         #         replace=False
         #     )
         num_leaders = len(self.shard_nodes)
+        leaders_id_list = []
+
         if num_leaders > 1:  # Only run this part if there is more than one shard
             leaders_id_list = []
             for id in range(num_leaders):
@@ -333,6 +335,7 @@ class Network:
                 self.full_nodes[id].neighbours_ids += list(neighbours_info[id])
         else:
             print("Skipping cross-shard leader connection, only one shard exists.")
+            leader_nodes = {self.get_shard_leader(0).id: self.full_nodes[self.get_shard_leader(0).id]}
 
                 
             for neighbour_id in neighbours_list:
