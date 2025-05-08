@@ -1040,6 +1040,9 @@ class FullNode(ParticipatingNode):
 
 
     def get_cross_shard_random_node_id(self):
+        if len(self.shard_leaders) <= 1:
+        # If there's only one shard, no need to choose a cross-shard node
+            return None
         cross_shard_leader = self.shard_leaders[self.id]
         while(cross_shard_leader.id == self.id):
             cross_shard_leader = random.choice(list(self.shard_leaders.values()))

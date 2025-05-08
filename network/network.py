@@ -123,20 +123,8 @@ class Network:
         
         # Allot nodes to different shards
         shard_nodes = nodes[num_principal_committe_nodes:]
-        if self.params["num_shards"] <= 0:
-        # No sharding — treat all nodes as part of one group
-            shard_groups = [np.array(shard_nodes)]  # just one group with all nodes
-            for node_id in shard_nodes:
-                self.full_nodes[node_id].shard_leader_id = None
-        else:
-            shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
-            # shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
-            for group in shard_groups:
-                leader_id = group[0]
-                for node_id in group:
-                    self.full_nodes[node_id].shard_leader_id = leader_id
-        self.shard_nodes = [group.tolist() for group in shard_groups]
-
+        shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
+        
         for idx in range(self.params["num_shards"]):
             # Randomly select the shard leader
             shard_leader_id = np.random.choice(shard_groups[idx])
@@ -200,11 +188,6 @@ class Network:
         degree = len(self.principal_committee_node_ids) // 2 + 1
         for idx in range(len(self.shard_nodes)):
             curr_leader = self.get_shard_leader(idx)
-            if self.params["num_shards"] <= 0:
-            # No sharding — simple P2P or centralized logic
-                for node in self.full_nodes:
-                    node.peers = [peer.node_id for peer in self.full_nodes if peer.node_id != node.node_id]
-                return
             possible_neighbours = self.principal_committee_node_ids
             
             neighbours_list = np.random.choice(
@@ -294,12 +277,10 @@ class Network:
 
             if id not in neighbours_info.keys():
                 neighbours_info[id] = set()            
-	# changed size
-            sample_size = min(degree, len(possible_neighbours))
-
+            
             neighbours_list = np.random.choice(
                 possible_neighbours, 
-                size=sample_size, 
+                size=degree, 
                 replace=False
             )
                 
@@ -321,9 +302,6 @@ class Network:
         """
         Return leader of the specified shard
         """
-        if self.params["num_shards"] <= 0:
-            return None
-
         return self.full_nodes[self.full_nodes[self.shard_nodes[idx][0]].shard_leader_id]
         # leader = [idx for idx in self.shard_nodes[idx] if self.full_nodes[idx].node_type == 2]
         # if len(leader_id) != 1:
