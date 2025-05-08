@@ -210,31 +210,12 @@ class Network:
             degree = len(self.shard_nodes[idx]) // 2 + 1
 
             for curr_node_id in self.shard_nodes[idx]:
-            #     possible_neighbours = self.shard_nodes[idx].copy()
-            #     possible_neighbours.remove(curr_node_id)
-            
-            #     neighbours_list = np.random.choice(
-            #         possible_neighbours, size=degree, replace=False
-            #     )
                 possible_neighbours = self.shard_nodes[idx].copy()
                 possible_neighbours.remove(curr_node_id)
-
-                if possible_neighbours:  # Ensure there are neighbors to sample from
-                    neighbours_list = np.random.choice(
-                        possible_neighbours, size=degree, replace=False
-                    )
-
-                    if curr_node_id not in neighbours_info.keys():
-                        neighbours_info[curr_node_id] = set()
-
-                    for neighbour_id in neighbours_list:
-                        if neighbour_id not in neighbours_info.keys():
-                            neighbours_info[neighbour_id] = set()
-
-                        neighbours_info[curr_node_id].add(neighbour_id)
-                        neighbours_info[neighbour_id].add(curr_node_id)
-
-                    self.full_nodes[curr_node_id].shard_leader = self.get_shard_leader(idx)
+            
+                neighbours_list = np.random.choice(
+                    possible_neighbours, size=degree, replace=False
+                )
 
                 if curr_node_id not in neighbours_info.keys():
                     neighbours_info[curr_node_id] = set()
@@ -283,60 +264,25 @@ class Network:
         Cross-shard Transactions -
             Connect shard leaders with each other
         """
-        # num_leaders = len(self.shard_nodes)
-        # leaders_id_list = []
-        # for id in range(num_leaders):
-        #     leaders_id_list.append(self.get_shard_leader(id).id)
-        
-        # neighbours_info = {}
-        # degree = num_leaders // 2 + 1
-        # for id in leaders_id_list:
-        #     possible_neighbours = leaders_id_list.copy()
-        #     possible_neighbours.remove(id) 
-
-        #     if id not in neighbours_info.keys():
-        #         neighbours_info[id] = set()            
-            
-        #     neighbours_list = np.random.choice(
-        #         possible_neighbours, 
-        #         size=degree, 
-        #         replace=False
-        #     )
         num_leaders = len(self.shard_nodes)
         leaders_id_list = []
+        for id in range(num_leaders):
+            leaders_id_list.append(self.get_shard_leader(id).id)
+        
+        neighbours_info = {}
+        degree = num_leaders // 2 + 1
+        for id in leaders_id_list:
+            possible_neighbours = leaders_id_list.copy()
+            possible_neighbours.remove(id) 
 
-        if num_leaders > 1:  # Only run this part if there is more than one shard
-            leaders_id_list = []
-            for id in range(num_leaders):
-                leaders_id_list.append(self.get_shard_leader(id).id)
+            if id not in neighbours_info.keys():
+                neighbours_info[id] = set()            
             
-            neighbours_info = {}
-            degree = num_leaders // 2 + 1
-            for id in leaders_id_list:
-                possible_neighbours = leaders_id_list.copy()
-                possible_neighbours.remove(id)
-
-                if possible_neighbours:  # Check if there are any possible neighbors
-                    neighbours_list = np.random.choice(
-                        possible_neighbours, size=degree, replace=False
-                    )
-
-                    for neighbour_id in neighbours_list:
-                        if neighbour_id not in neighbours_info.keys():
-                            neighbours_info[neighbour_id] = set()
-
-                        neighbours_info[id].add(neighbour_id)
-                        neighbours_info[neighbour_id].add(id)
-
-            leader_nodes = {id: self.full_nodes[id] for id in leaders_id_list}
-
-            for id in leaders_id_list:
-                self.full_nodes[id].init_shard_leaders(leader_nodes)
-                self.full_nodes[id].neighbours_ids += list(neighbours_info[id])
-        else:
-            print("Skipping cross-shard leader connection, only one shard exists.")
-            leader_nodes = {self.get_shard_leader(0).id: self.full_nodes[self.get_shard_leader(0).id]}
-
+            neighbours_list = np.random.choice(
+                possible_neighbours, 
+                size=degree, 
+                replace=False
+            )
                 
             for neighbour_id in neighbours_list:
                 if neighbour_id not in neighbours_info.keys():

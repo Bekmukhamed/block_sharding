@@ -251,22 +251,10 @@ class FullNode(ParticipatingNode):
                 for txn in cross_shard_txns:
                     txn.cross_shard_status = 1
                     receiver_node_id = self.get_cross_shard_random_node_id()
-
-                    # Ensure that receiver_node_id is not None before accessing curr_shard_nodes
-                    if receiver_node_id is None:
-                        print(f"Error: receiver_node_id is None for tx {txn.id}. Skipping this transaction.")
-                        continue  # Skip this transaction and continue the loop
-
-                    # Check if the node_id exists in curr_shard_nodes before accessing
-                    if receiver_node_id not in self.curr_shard_nodes:
-                        print(f"Error: receiver_node_id {receiver_node_id} not found in curr_shard_nodes for tx {txn.id}. Skipping this transaction.")
-                        continue  # Skip this transaction and continue the loop
                     
-                    # Now it's safe to access the node type
                     if self.curr_shard_nodes[receiver_node_id].node_type == 1:
                         print(self.shard_leaders.keys())
                         raise RuntimeError(f"Principal committee node {receiver_node_id} can't be a receiver of cross-shard tx for tx {txn.id}")
-                    
                     txn.set_receiver(receiver_node_id)
                     
                 filtered_curr_shard_nodes = []
@@ -1052,9 +1040,6 @@ class FullNode(ParticipatingNode):
 
 
     def get_cross_shard_random_node_id(self):
-        if len(self.shard_leaders) <= 1:
-        # If there's only one shard, no need to choose a cross-shard node
-            return None
         cross_shard_leader = self.shard_leaders[self.id]
         while(cross_shard_leader.id == self.id):
             cross_shard_leader = random.choice(list(self.shard_leaders.values()))
