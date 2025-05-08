@@ -1,6 +1,4 @@
-<p align="center">
-    <img src="https://github.com/vishishtpriyadarshi/ShardEval/blob/main/docs/ShardEval.png">
-</p>
+
 
 <hr />
 
