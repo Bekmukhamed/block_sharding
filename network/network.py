@@ -126,15 +126,15 @@ class Network:
         if self.params["num_shards"] <= 0:
         # No sharding — treat all nodes as part of one group
             shard_groups = [np.array(shard_nodes)]  # just one group with all nodes
-	    for node_id in shard_nodes:
+            for node_id in shard_nodes:
                 self.full_nodes[node_id].shard_leader_id = None
         else:
             shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
             # shard_groups = np.array_split(shard_nodes, self.params["num_shards"])
-	    for group in shard_groups:
-            leader_id = group[0]
-            for node_id in group:
-                self.full_nodes[node_id].shard_leader_id = leader_id
+            for group in shard_groups:
+                leader_id = group[0]
+                for node_id in group:
+                    self.full_nodes[node_id].shard_leader_id = leader_id
         self.shard_nodes = [group.tolist() for group in shard_groups]
 
         for idx in range(self.params["num_shards"]):
@@ -200,11 +200,11 @@ class Network:
         degree = len(self.principal_committee_node_ids) // 2 + 1
         for idx in range(len(self.shard_nodes)):
             curr_leader = self.get_shard_leader(idx)
-	    if self.params["num_shards"] <= 0:
-    # No sharding — simple P2P or centralized logic
+            if self.params["num_shards"] <= 0:
+            # No sharding — simple P2P or centralized logic
                 for node in self.full_nodes:
                     node.peers = [peer.node_id for peer in self.full_nodes if peer.node_id != node.node_id]
-    	        return
+                return
             possible_neighbours = self.principal_committee_node_ids
             
             neighbours_list = np.random.choice(
